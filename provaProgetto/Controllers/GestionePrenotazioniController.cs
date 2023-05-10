@@ -21,7 +21,7 @@ namespace provaProgetto.Controllers
             g = new GestioneDati(_configuration);
 		}
 
-        [HttpGet("appuntamenti/get/{id}")]
+        [HttpGet("appuntamenti/{id}")]
         public IActionResult getAppuntamento(int id)
         {
             Appuntamento a = g.GetAppuntamento(id);
@@ -34,8 +34,15 @@ namespace provaProgetto.Controllers
                 return NotFound();
             }
         }
+        [HttpGet("appuntamenti/get")]
+        public IActionResult ListaAppuntamenti()
+        {
+            var listaApp = g.ListaAppuntamenti();
+            return Ok(listaApp);
+        }
 
-        [HttpPost("appuntamenti/put")]
+
+        [HttpPost("appuntamenti")]
         public IActionResult InserisciAppuntamento([FromBody] Appuntamento app)
         {
             bool esito = g.InserisciAppuntamento(app);
@@ -50,35 +57,52 @@ namespace provaProgetto.Controllers
 
         }
 
-        [Route("appuntamenti/get")]
-        public IActionResult ListaAppuntamenti()
-        {
-            var listaApp = g.ListaAppuntamenti();
-            return Ok(listaApp);
-        }
+        
 
-        [Route("eventi/get")]
+        //
+        [HttpGet("eventi")]
         public IActionResult ListaEventi()
         {
             var listaApp = g.ListaAppuntamenti();
             return Ok(listaApp);
         }
 
-        [HttpPost("evento/put")]
+        [HttpPost("eventi")]
         public IActionResult InserisciEvento([FromBody] Evento e)
         {
-            bool esito = g.InsierisciEvento(e);
+            bool esito = g.InserisciEvento(e);
             if (esito)
             {
                 return Ok(esito);
-                Console.WriteLine("ss");
             }
             else
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Errore inserimento");
             }
-
         }
+
+        [HttpPut("eventi/{id}")]
+        public IActionResult UpdateEvento([FromBody] Evento e)
+        {
+            bool esito = g.UpdateEvento(e);
+            if (esito)
+            {
+                return Ok(esito);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Errore update");
+            }
+        }
+
+        [HttpDelete("eventi/{id}")]
+        public IActionResult ListaEventi()
+        {
+            var listaApp = g.ListaAppuntamenti();
+            return Ok(listaApp);
+        }
+
+
 
     }
 }

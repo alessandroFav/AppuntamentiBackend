@@ -10,6 +10,9 @@ namespace provaProgetto.Models
 		public int idOrganizzatore { get; set; }
         public int numPosti { get; set; }
         public int durata { get; set; }
+        public int nPartecipanti { get; set; }
 	}
+
+
 }
 

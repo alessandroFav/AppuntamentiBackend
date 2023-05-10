@@ -20,9 +20,9 @@ namespace provaProgetto.Controllers
                 EnableSsl = true
             };
 
-            string html = "<t1><br>PASSWORD REQUEST<br></t1>" +
-                "<p>Hai smarrito la password, inserisci la mail nel campo sottostante per iniziare il processo di reset della password</p>";
-            MailMessage msg = new MailMessage("from@example.com", "to@example.com", "Hello world", html);
+            string body = System.IO.File.ReadAllText("Controllers/mailFormatting.html");
+
+            MailMessage msg = new MailMessage("from@example.com", "to@example.com", "Hello world", body);
             msg.IsBodyHtml = true;
             client.Send(msg);
             return Ok("sent");

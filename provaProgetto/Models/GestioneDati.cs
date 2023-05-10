@@ -62,10 +62,10 @@ namespace provaProgetto.Controllers
             return con.Query<Evento>(query);
         }
 
-        public bool InsierisciEvento(Evento e)
+        public bool InserisciEvento(Evento e)
         {
             using var con = new MySqlConnection(s);
-            var query = @"INSERT INTO eventi(nome,materia,data,idOrganizzatore,numPosti,durata) VALUES(@name,@mat,@date,@idOrg,@nPosti,@dur)";
+            var query = @"INSERT INTO eventi(nome,materia,data,idOrganizzatore,numPosti,durata,nPartecipanti) VALUES(@name,@mat,@date,@idOrg,@nPosti,@dur,@partecipanti)";
             var param = new
             {
                 name = e.nome,
@@ -73,7 +73,38 @@ namespace provaProgetto.Controllers
                 date = e.data,
                 idOrg = e.idOrganizzatore,
                 nPosti = e.numPosti,
-                dur = e.data
+                dur = e.data,
+                partecipanti=e.nPartecipanti
+            };
+            bool esito;
+            try
+            {
+                con.Execute(query, param);
+                esito = true;
+            }
+            catch (Exception err)
+            {
+                esito = false;
+            }
+            return esito;
+        }
+
+        public bool UpdateEvento(Evento e)
+        {
+            using var con = new MySqlConnection(s);
+            var query = "UPDATE eventi SET nome=@name,materia=@mat,data=@date,idOrganizzatore=@idOrd,numPosti=@nP,durata=@dur,nPartecipanti=@part"+
+                "WHERE id=@idEvento";
+            var param = new
+            {
+                idEvento=e.id,
+                name = e.nome,
+                mat = e.materia,
+                date = e.data,
+                idOrg = e.idOrganizzatore,
+                nPosti = e.numPosti,
+                dur = e.data,
+                partecipanti = e.nPartecipanti
+
             };
             bool esito;
             try
