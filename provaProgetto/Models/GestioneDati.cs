@@ -15,28 +15,6 @@ namespace provaProgetto.Controllers
         }
 
 		//CRUD appuntamenti
-		public bool InserisciAppuntamento(Appuntamento a)
-		{
-            using var con = new MySqlConnection(s);
-            var query = @"INSERT INTO appuntamenti(idEvento, idUtente, dataPrenotazione) VALUES(@idEv,@idUser,@data)";
-            var param = new
-            {
-                idEv = a.idEvento,
-                idUser = a.idUtente,
-                data = a.dataPrenotazione,
-            };
-            bool esito;
-            try
-            {
-                con.Execute(query, param);
-                esito = true;
-            }
-            catch(Exception e)
-            {
-                esito = false;
-            }
-            return esito;
-        }
 
         public Appuntamento GetAppuntamento(int id)
         {
@@ -51,6 +29,70 @@ namespace provaProgetto.Controllers
             using var con = new MySqlConnection(s);
             var query ="SELECT * from appuntamenti";
             return con.Query<Appuntamento>(query);
+        }
+        public bool InserisciAppuntamento(Appuntamento a)
+        {
+            using var con = new MySqlConnection(s);
+            var query = @"INSERT INTO appuntamenti(idEvento, idUtente, dataPrenotazione) VALUES(@idEv,@idUser,@data)";
+            var param = new
+            {
+                idEv = a.idEvento,
+                idUser = a.idUtente,
+                data = a.dataPrenotazione,
+            };
+            bool esito;
+            try
+            {
+                con.Execute(query, param);
+                esito = true;
+            }
+            catch (Exception e)
+            {
+                esito = false;
+            }
+            return esito;
+        }
+        public bool UpdateAppuntamento(Appuntamento a)
+        {
+            using var con = new MySqlConnection(s);
+            var query = "UPDATE appuntamenti SET @idEv,@idUser,@data" +
+                "WHERE id=@id";
+            var param = new
+            {
+                id = a.id,
+                idEv = a.idEvento,
+                idUser = a.idUtente,
+                data = a.dataPrenotazione,
+            };
+            bool esito;
+            try
+            {
+                con.Execute(query, param);
+                esito = true;
+            }
+            catch (Exception err)
+            {
+                esito = false;
+            }
+            return esito;
+        }
+
+        public bool DeleteAppuntamento(int id)
+        {
+            using var con = new MySqlConnection(s);
+            var query = "DELETE from appuntamenti WHERE id=@idAppuntamento";
+            var param = new { idAppuntamento = id };
+            bool esito;
+            try
+            {
+                con.Execute(query, param);
+                esito = true;
+            }
+            catch (Exception err)
+            {
+                esito = false;
+            }
+            return esito;
         }
 
 
@@ -110,6 +152,23 @@ namespace provaProgetto.Controllers
             try
             {
                 con.Execute(query, param);
+                esito = true;
+            }
+            catch (Exception err)
+            {
+                esito = false;
+            }
+            return esito;
+        }
+
+        public bool DeleteEvento(int id)
+        {
+            using var con = new MySqlConnection(s);
+            var query = "DELETE from eventi WHERE id=" + id;
+            bool esito;
+            try
+            {
+                con.Execute(query);
                 esito = true;
             }
             catch (Exception err)

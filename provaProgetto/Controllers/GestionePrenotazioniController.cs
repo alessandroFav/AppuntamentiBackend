@@ -54,10 +54,30 @@ namespace provaProgetto.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,"Errore inserimento");
             }
-
         }
 
-        
+        [HttpPut("appuntamenti/{id}")]
+        public IActionResult UpdateAppuntamento([FromBody] Appuntamento a)
+        {
+            bool esito = g.UpdateAppuntamento(a);
+            if (esito)
+            {
+                return Ok(esito);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Errore update");
+            }
+        }
+
+        [HttpDelete("appuntamenti/{id}")]
+        public IActionResult DeleteAppuntamento(int id)
+        {
+            var listaApp = g.DeleteAppuntamento(id);
+            return Ok(listaApp);
+        }
+
+
 
         //
         [HttpGet("eventi")]
@@ -96,9 +116,9 @@ namespace provaProgetto.Controllers
         }
 
         [HttpDelete("eventi/{id}")]
-        public IActionResult ListaEventi()
+        public IActionResult DeleteEvento(int id)
         {
-            var listaApp = g.ListaAppuntamenti();
+            var listaApp = g.DeleteEvento(id);
             return Ok(listaApp);
         }
 
