@@ -11,44 +11,73 @@ namespace provaProgetto.Controllers
 		private string s; 
 		public GestioneUtente(IConfiguration configuration)
 		{
-            s = configuration.GetConnectionString("ScuolaConnection")!;
+            s = configuration.GetConnectionString("progettoConnection")!;
         }
-		public Utente FindUtente(string mail, string password)
+		public Utente? FindUtente(int id)
 		{
 			using var con = new MySqlConnection(s);
-			string query = @"SELECT * FROM utenti WHERE mail=@username and password=@hashPassword";
+			string query = "SELECT * FROM utenti WHERE id=@userId";
             var param = new
             {
-                username = mail,
-                hashPassword = ComputeSha256Hash(password)
+                userId = id
             };
-            return con.Query<Utente>(query, param).SingleOrDefault()!;
+            return con.Query<Utente>(query, param).SingleOrDefault();
         }
-
-        public bool InserisciUtente(Registrazione u)
+        public Utente? FindUtente(string mail)
         {
             using var con = new MySqlConnection(s);
-            var query = @"INSERT INTO utenti(nome,cognome,mail,password,ruolo) VALUES(@name,@surname,@email,@psw,@role)";
+            string query = "SELECT * FROM utenti WHERE mail=@email";
+            var param = new
+            {
+                email = mail
+            };
+            return con.Query<Utente>(query, param).SingleOrDefault();
+        }
+
+        public Utente? InserisciUtente(Registrazione u)
+        {
+            using var con = new MySqlConnection(s);
+            var query = "INSERT INTO utenti(nome,cognome,mail,password) VALUES(@name,@surname,@email,@psw)";
             var param = new
             {
                 name = u.nome,
                 surname = u.cognome,
                 email = u.mail,
                 psw = ComputeSha256Hash(u.password),
-                role = u.ruolo
 
             };
-            bool esito;
+            Utente? ris = null;
             try
             {
                 con.Execute(query, param);
-                esito = true;
+                ris = FindUtente(u.mail);
+            }
+            catch
+            {}
+            return ris;
+        }
+        public bool UpdateUtente(Utente user)
+        {
+            using var con = new MySqlConnection(s);
+            string query = "UPDATE utenti SET nome=@name, cognome=@surname, mail=@email, password=@psw, VerifiedAt=@verifiedat WHERE id=@Id";
+            var param = new
+            {
+                Id = user.id,
+                name=user.nome,
+                surname=user.cognome,
+                email=user.mail,
+                psw = ComputeSha256Hash(user.password),
+                verifiedat = user.VerifiedAt,
+            };
+            try
+            {
+                con.Execute(query, param);
+                return true;
             }
             catch
             {
-                esito = false;
+                return false;
             }
-            return esito;
         }
 
         public string ComputeSha256Hash(string rawData)
@@ -67,7 +96,6 @@ namespace provaProgetto.Controllers
             }
             return builde.ToString();
         }
-
 
     }
 }

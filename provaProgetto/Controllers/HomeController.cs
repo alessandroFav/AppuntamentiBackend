@@ -43,46 +43,46 @@ public class HomeController : Controller
         return View(new Utente());
     }
 
-    [HttpPost]
-    public IActionResult Login(Utente user)
-    {
+    //[HttpPost]
+    //public IActionResult Login(Utente user)
+    //{
 
-        Utente u = gUtente.FindUtente(user.mail, user.password);
-        if (u != null)
-        {
-            gestioneAutenticazione.ImpostaUtente(user.mail);
-            return RedirectToAction("log", "Index");
-        }
-        else
-        {
-            ModelState.AddModelError("", "Utente sconosciuto");
-            return View(u);
-        }
-    }
+    //    Utente u = gUtente.FindUtente(user.mail, user.password);
+    //    if (u != null)
+    //    {
+    //        gestioneAutenticazione.ImpostaUtente(user.mail);
+    //        return RedirectToAction("log", "Index");
+    //    }
+    //    else
+    //    {
+    //        ModelState.AddModelError("", "Utente sconosciuto");
+    //        return View(u);
+    //    }
+    //}
 
     public IActionResult SignIn()
     {
         return View(new Registrazione());
     }
 
-    [HttpPost]
-    public IActionResult SignIn(Registrazione registrazione)
-    {
-        if(!ModelState.IsValid)
-        {
-            return View(registrazione);
-        }
-        bool esito = gUtente.InserisciUtente(registrazione);
-        if(esito)
-        {
-            return Ok(registrazione);
-        }
-        else
-        {
-            ModelState.AddModelError("", "Errore di inserimento");
-            return View(registrazione);
-        }
-    }
+    //[HttpPost]
+    //public IActionResult SignIn(Registrazione registrazione)
+    //{
+    //    if(!ModelState.IsValid)
+    //    {
+    //        return View(registrazione);
+    //    }
+    //    bool esito = gUtente.InserisciUtente(registrazione);
+    //    if(esito)
+    //    {
+    //        return Ok(registrazione);
+    //    }
+    //    else
+    //    {
+    //        ModelState.AddModelError("", "Errore di inserimento");
+    //        return View(registrazione);
+    //    }
+    //}
 
     public IActionResult Logout(ISession s)
     {

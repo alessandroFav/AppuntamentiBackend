@@ -95,12 +95,12 @@ namespace provaProgetto.Controllers
             }
         }
 
-        [HttpDelete("eventi/{id}")]
-        public IActionResult ListaEventi()
-        {
-            var listaApp = g.ListaAppuntamenti();
-            return Ok(listaApp);
-        }
+        //[HttpDelete("eventi/{id}")]
+        //public IActionResult ListaEventi()
+        //{
+        //    var listaApp = g.ListaAppuntamenti();
+        //    return Ok(listaApp);
+        //}
 
 
 

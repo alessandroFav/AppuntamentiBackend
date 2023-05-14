@@ -8,12 +8,7 @@ namespace provaProgetto.Controllers
         public string cognome { get; set; }
 		public string mail { get; set; }
         public string password { get; set; }
-        public string ruolo { get; set; }
-
-        public Utente()
-		{
-
-		}
+        public DateTime? VerifiedAt { get; set; }
 	}
 }
 
