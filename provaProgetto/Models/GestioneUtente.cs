@@ -3,6 +3,7 @@ using System.Text;
 using MySql.Data.MySqlClient;
 using System.Security.Cryptography;
 using Dapper;
+using BC = BCrypt.Net.BCrypt;
 
 namespace provaProgetto.Controllers
 {
@@ -43,7 +44,7 @@ namespace provaProgetto.Controllers
                 name = u.nome,
                 surname = u.cognome,
                 email = u.mail,
-                psw = ComputeSha256Hash(u.password),
+                psw = BC.HashPassword(u.password)
 
             };
             Utente? ris = null;
@@ -59,14 +60,14 @@ namespace provaProgetto.Controllers
         public bool UpdateUtente(Utente user)
         {
             using var con = new MySqlConnection(s);
-            string query = "UPDATE utenti SET nome=@name, cognome=@surname, mail=@email, password=@psw, VerifiedAt=@verifiedat WHERE id=@Id";
+            string query = "UPDATE utenti SET nome=@name, cognome=@surname, mail=@email, VerifiedAt=@verifiedat WHERE id=@Id";
             var param = new
             {
                 Id = user.id,
                 name=user.nome,
                 surname=user.cognome,
                 email=user.mail,
-                psw = ComputeSha256Hash(user.password),
+                //psw = BC.HashPassword(user.password),
                 verifiedat = user.VerifiedAt,
             };
             try
@@ -86,15 +87,15 @@ namespace provaProgetto.Controllers
             using SHA256 sha256 = SHA256.Create();
             byte[] passwordBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(rawData));
             //converto i byte in string
-            StringBuilder builde = new StringBuilder();
+            StringBuilder builder = new StringBuilder();
             for (int i = 0; i < passwordBytes.Length; i++)
             {
-                builde.Append(passwordBytes[i].ToString("x2"));
+                builder.Append(passwordBytes[i].ToString("x2"));
                 //x = hesadecimal form
                 //2 = 2 characteers
 
             }
-            return builde.ToString();
+            return builder.ToString();
         }
 
     }

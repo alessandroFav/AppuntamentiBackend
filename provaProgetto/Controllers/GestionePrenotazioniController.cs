@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using provaProgetto.Models;
@@ -7,6 +8,7 @@ namespace provaProgetto.Controllers
 {
     [Route("gestione")]
     [ApiController]
+    [Authorize]
     public class GestionePrenotazioniController:Controller
 	{
         private readonly ILogger<GestionePrenotazioniController> _logger;
@@ -34,7 +36,7 @@ namespace provaProgetto.Controllers
                 return NotFound();
             }
         }
-        [HttpGet("appuntamenti/get")]
+        [HttpGet("appuntamenti")]
         public IActionResult ListaAppuntamenti()
         {
             var listaApp = g.ListaAppuntamenti();

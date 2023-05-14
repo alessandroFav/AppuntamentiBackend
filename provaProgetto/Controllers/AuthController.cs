@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using provaProgetto.Models;
+using BC = BCrypt.Net.BCrypt;
 
 namespace provaProgetto.Controllers
 {
@@ -14,6 +15,7 @@ namespace provaProgetto.Controllers
 
         private GestioneUtente g;
         private GestioneMail gMail;
+        private JwtManager jwt;
 
         public AuthController(ILogger<GestionePrenotazioniController> logger, IConfiguration configuration)
         {
@@ -21,12 +23,14 @@ namespace provaProgetto.Controllers
             _configuration = configuration;
             g = new GestioneUtente(_configuration);
             gMail = new GestioneMail();
+            jwt = new JwtManager(_configuration);
         }
 
         [HttpPost("registrazione")]
         public IActionResult RegistraUtante([FromBody] Registrazione userData)
         {
-            if(g.FindUtente(userData.mail) == null)
+            if (!ModelState.IsValid) { return StatusCode(StatusCodes.Status400BadRequest, "Bad request"); }
+            if (g.FindUtente(userData.mail) == null)
             {
                 Utente? esito = g.InserisciUtente(userData);
                 if (esito != null)
@@ -90,6 +94,29 @@ namespace provaProgetto.Controllers
                     return StatusCode(StatusCodes.Status400BadRequest, "Email già verificata");
                 }
 
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status404NotFound, "Utente non trovato");
+            }
+        }
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] Login userData)
+        {
+            if (!ModelState.IsValid) { return StatusCode(StatusCodes.Status400BadRequest, "Bad request"); }
+            Utente? esito = g.FindUtente(userData.email);
+            if (esito != null)
+            {
+                if(esito!.VerifiedAt == null) { return StatusCode(StatusCodes.Status401Unauthorized, "Email non verificata"); }
+                if(BC.Verify(userData.password, esito!.password))
+                {
+                    var token = jwt.GenerateJwtToken(esito!);
+                    return Ok(token);
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, "Email e password non corrispondono");
+                }
             }
             else
             {
