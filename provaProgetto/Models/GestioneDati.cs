@@ -4,7 +4,7 @@ using Dapper;
 using MySql.Data.MySqlClient;
 using provaProgetto.Models;
 
-namespace provaProgetto.Controllers
+namespace provaProgetto.Models
 {
 	public class GestioneDati
 	{

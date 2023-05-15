@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace provaProgetto.Controllers
+namespace provaProgetto.Models
 {
 	public class Registrazione
 	{

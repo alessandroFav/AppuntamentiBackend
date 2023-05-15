@@ -2,13 +2,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using provaProgetto.Attributes;
+using provaProgetto.Middlewares;
 using provaProgetto.Models;
 
 namespace provaProgetto.Controllers
 {
     [Route("gestione")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
+    [provaProgetto.Attributes.Authorize]
     public class GestionePrenotazioniController:Controller
 	{
         private readonly ILogger<GestionePrenotazioniController> _logger;

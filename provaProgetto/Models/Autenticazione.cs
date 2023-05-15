@@ -1,5 +1,5 @@
 ﻿using System;
-namespace provaProgetto.Controllers
+namespace provaProgetto.Models
 {
 	public class Autenticazione
 	{

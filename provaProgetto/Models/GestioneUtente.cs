@@ -4,10 +4,12 @@ using MySql.Data.MySqlClient;
 using System.Security.Cryptography;
 using Dapper;
 using BC = BCrypt.Net.BCrypt;
+using provaProgetto.Dipendenze;
+//using provaProgetto.Controllers;
 
-namespace provaProgetto.Controllers
+namespace provaProgetto.Models
 {
-	public class GestioneUtente
+	public class GestioneUtente: IGestioneUtente
 	{
 		private string s; 
 		public GestioneUtente(IConfiguration configuration)

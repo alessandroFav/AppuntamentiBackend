@@ -12,15 +12,18 @@ namespace provaProgetto.Controllers
 	{
         private readonly ILogger<GestionePrenotazioniController> _logger;
         private readonly IConfiguration _configuration;
+        private HttpContext _context;
 
         private GestioneUtente g;
         private GestioneMail gMail;
         private JwtManager jwt;
 
-        public AuthController(ILogger<GestionePrenotazioniController> logger, IConfiguration configuration)
+
+        public AuthController(ILogger<GestionePrenotazioniController> logger, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _configuration = configuration;
+            _context = httpContextAccessor.HttpContext!;
             g = new GestioneUtente(_configuration);
             gMail = new GestioneMail();
             jwt = new JwtManager(_configuration);
