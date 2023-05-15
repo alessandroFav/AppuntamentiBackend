@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using provaProgetto.Models;
@@ -8,6 +9,7 @@ namespace provaProgetto.Controllers
 {
     [Route("auth")]
     [ApiController]
+    [AllowAnonymous]
     public class AuthController:Controller
 	{
         private readonly ILogger<GestionePrenotazioniController> _logger;

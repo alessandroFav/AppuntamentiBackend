@@ -57,5 +57,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}");
 
 app.UseJwtMiddleware();
+app.UseParamsMiddleware();
 app.Run();
 

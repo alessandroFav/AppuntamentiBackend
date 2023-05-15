@@ -16,20 +16,39 @@ namespace provaProgetto.Controllers
 	{
         private readonly ILogger<GestionePrenotazioniController> _logger;
         private readonly IConfiguration _configuration;
+        private HttpContext _context;
 
         private GestioneDati g;
+        private GestioneUtente gUtenti;
 
-        public GestionePrenotazioniController(ILogger<GestionePrenotazioniController> logger, IConfiguration configuration)
+        public GestionePrenotazioniController(ILogger<GestionePrenotazioniController> logger, IConfiguration configuration, 
+            IHttpContextAccessor httpContextAccessor)
 		{
 			_logger = logger;
 			_configuration = configuration;
+            _context = httpContextAccessor.HttpContext!;
             g = new GestioneDati(_configuration);
+            gUtenti = new GestioneUtente(_configuration);
 		}
 
-        [HttpGet("appuntamenti/{id}")]
-        public IActionResult getAppuntamento(int id)
+        [HttpGet("utenti/{id}")]
+        public IActionResult GetUtente(int id)
         {
-            Appuntamento a = g.GetAppuntamento(id);
+            Utente? user = gUtenti.FindUtente(id);
+            if (user != null) {
+                return Ok(user!);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status404NotFound, "User not found");
+            }
+        }
+
+        [HttpGet("appuntamenti/{idAppuntamento}")]
+        public IActionResult getAppuntamento(int idAppuntamento)
+        {
+            //Utente user = (Utente)_context.Items["user"];
+            Appuntamento a = g.GetAppuntamento(idAppuntamento);
             if(a!=null)
             {
                 return Ok(a.id);
@@ -86,7 +105,7 @@ namespace provaProgetto.Controllers
             }
         }
 
-        [HttpPut("eventi/{id}")]
+        [HttpPut("eventi/{idEvento}")]
         public IActionResult UpdateEvento([FromBody] Evento e)
         {
             bool esito = g.UpdateEvento(e);
