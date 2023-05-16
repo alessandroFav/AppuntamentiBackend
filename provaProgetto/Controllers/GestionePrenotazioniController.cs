@@ -118,6 +118,38 @@ namespace provaProgetto.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Errore update");
             }
         }
+        [HttpPatch("resetPassword/{id}")]
+        public IActionResult ResetPassword(int id, [FromBody] string newPassword)
+        {
+            Utente? user = gUtenti.FindUtente(id);
+
+            if(user!.VerifiedAt == null)
+                return StatusCode(StatusCodes.Status401Unauthorized, "Email non verificata");
+
+            bool esito = gUtenti.ResetPassword(user!.id, newPassword);
+            if (esito)
+            {
+                return Ok(esito);
+            }
+            else { return StatusCode(StatusCodes.Status500InternalServerError, "Errore update"); }
+        }
+        [HttpPut("updateUtente/{id}")]
+        public IActionResult UpdateUtente(int id, [FromBody] UpdateUtente userData)
+        {
+            Utente? user = gUtenti.FindUtente(id);
+            if (user!.VerifiedAt == null)
+                return StatusCode(StatusCodes.Status401Unauthorized, "Email non verificata");
+            user.nome = String.IsNullOrEmpty(userData.nome)? user.nome : userData.nome;
+            user.cognome = String.IsNullOrEmpty(userData.cognome)? user.cognome : userData.cognome;
+            user.mail = String.IsNullOrEmpty(userData.email)? user.mail : userData.email;
+
+            bool esito = gUtenti.UpdateUtente(user!);
+            if (esito)
+            {
+                return Ok(esito);
+            }
+            else { return StatusCode(StatusCodes.Status500InternalServerError, "Errore update"); }
+        }
 
         //[HttpDelete("eventi/{id}")]
         //public IActionResult ListaEventi()

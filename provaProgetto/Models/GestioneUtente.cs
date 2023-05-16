@@ -82,6 +82,22 @@ namespace provaProgetto.Models
                 return false;
             }
         }
+        public bool ResetPassword(int userId, string newPassword)
+        {
+            using var con = new MySqlConnection(s);
+            string query = "UPDATE utenti SET password=@psw WHERE id=@userId";
+            var param = new
+            {
+                userId = userId,
+                psw = BC.HashPassword(newPassword)
+            };
+            try
+            {
+                con.Execute(query, param);
+                return true;
+            }
+            catch { return false; }
+        }
 
         public string ComputeSha256Hash(string rawData)
         {
