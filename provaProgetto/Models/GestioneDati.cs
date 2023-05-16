@@ -2,11 +2,12 @@
 using System.Configuration;
 using Dapper;
 using MySql.Data.MySqlClient;
+using provaProgetto.Dipendenze;
 using provaProgetto.Models;
 
-namespace provaProgetto.Controllers
+namespace provaProgetto.Models
 {
-	public class GestioneDati
+	public class GestioneDati: IGestioneDati
 	{
 		private string s;
         public GestioneDati(IConfiguration configuration)
@@ -16,12 +17,15 @@ namespace provaProgetto.Controllers
 
 		//CRUD appuntamenti
 
-        public Appuntamento GetAppuntamento(int id)
+        public Appuntamento? GetAppuntamento(int id)
         {
             using var con = new MySqlConnection(s);
-            var query = "SELECT * from appuntamenti WHERE id="+id;
-            IEnumerable<Appuntamento> app = con.Query<Appuntamento>(query);
-            return app.ToList()[0];
+            var query = "SELECT * from appuntamenti WHERE id=@idApp";
+            var param = new
+            {
+                idApp = id
+            };
+            return con.Query<Appuntamento>(query, param).FirstOrDefault();
         }
 
         public IEnumerable<Appuntamento> ListaAppuntamenti()
@@ -159,6 +163,16 @@ namespace provaProgetto.Controllers
                 esito = false;
             }
             return esito;
+        }
+        public Evento? GetEvento(int id)
+        {
+            using var conn = new MySqlConnection(s);
+            var query = "SELECT * from eventi WHERE id=@idEvento";
+            var param = new
+            {
+                idEvento = id
+            };
+            return conn.Query<Evento>(query, param).FirstOrDefault();
         }
 
         public bool DeleteEvento(int id)

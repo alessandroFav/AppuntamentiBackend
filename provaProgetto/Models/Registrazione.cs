@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace provaProgetto.Controllers
+namespace provaProgetto.Models
 {
 	public class Registrazione
 	{
@@ -15,8 +15,6 @@ namespace provaProgetto.Controllers
         public string password { get; set; }
         [Compare(nameof(password))]
         public string confermaPassword { get; set; }
-        [Required]
-        public string ruolo { get; set; }
 
 	}
 }
