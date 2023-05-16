@@ -36,6 +36,7 @@ builder.Services.AddRazorTemplating();
 //});
 builder.Services.AddScoped<IGestioneUtente, GestioneUtente>();
 builder.Services.AddScoped<IJwtManager, JwtManager>();
+builder.Services.AddScoped<IGestioneDati, GestioneDati>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

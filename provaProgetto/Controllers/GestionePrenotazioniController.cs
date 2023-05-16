@@ -80,8 +80,63 @@ namespace provaProgetto.Controllers
             }
 
         }
-
-        
+        [HttpPut("appuntamenti/{idAppuntamento}")]
+        public IActionResult UpdateAppuntamento(int idAppuntamento, [FromBody] UpdateAppuntamento a)
+        {
+            bool esito = g.UpdateAppuntamento(idAppuntamento, a);
+            if (esito)
+            {
+                return Ok(esito);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Errore update");
+            }
+        }
+        [HttpDelete("appuntamenti/{idAppuntamento}")]
+        public IActionResult DeleteAppuntamento(int id)
+        {
+            var listaApp = g.DeleteAppuntamento(id);
+            return Ok(listaApp);
+        }
+        [HttpGet("appuntamenti/{id}")]
+        public IActionResult BookingsUser(int id)
+        {
+            var listaBookings = g.bookingsUser(id);
+            return Ok(listaBookings);
+        }
+        [HttpDelete("appuntamenti/{id}")]
+        public IActionResult DeleteBookings(int id)
+        {
+            var listaApp = g.DeleteAppuntamentiUser(id);
+            return Ok(listaApp);
+        }
+        [HttpPost("appuntamenti/{idEvento}")]
+        public IActionResult InserisciAppuntamentoUser(int idEvento)
+        {
+            Utente u = (Utente)_context.Items["user"]!;
+            bool esito = g.InserisciAppuntamentoUser(idEvento, u);
+            if (esito)
+            {
+                return Ok(esito);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Errore inserimento");
+            }
+        }
+        [HttpGet("futureBookings")]
+        public IActionResult ListaAppuntamentiPast()
+        {
+            var listaApp = g.futureBookings();
+            return Ok(listaApp);
+        }
+        [HttpGet("pastBookings")]
+        public IActionResult ListaAppuntamentiFuture()
+        {
+            var listaApp = g.pastBookings();
+            return Ok(listaApp);
+        }
 
         //
         [HttpGet("eventi")]
@@ -117,7 +172,22 @@ namespace provaProgetto.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Errore update");
             }
+
         }
+        [HttpGet("events/{id}")]
+        public IActionResult ListaEventiUser(int idUser)
+        {
+            var listaApp = g.ListaEventiUser(idUser);
+            return Ok(listaApp);
+        }
+
+        [HttpDelete("events/{idEvento}")]
+        public IActionResult DeleteEvento(int idEvento)
+        {
+            var listaApp = g.DeleteEvento(idEvento);
+            return Ok(listaApp);
+        }
+
         [HttpPatch("resetPassword/{id}")]
         public IActionResult ResetPassword(int id, [FromBody] string newPassword)
         {
