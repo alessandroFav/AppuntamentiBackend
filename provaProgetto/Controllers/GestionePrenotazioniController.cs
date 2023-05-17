@@ -8,12 +8,12 @@ using provaProgetto.Models;
 
 namespace provaProgetto.Controllers
 {
-    [Route("api")]
+    [Route("gestione")]
     [ApiController]
     //[Authorize]
     [provaProgetto.Attributes.Authorize]
-    public class GestionePrenotazioniController:Controller
-	{
+    public class GestionePrenotazioniController : Controller
+    {
         private readonly ILogger<GestionePrenotazioniController> _logger;
         private readonly IConfiguration _configuration;
         private HttpContext _context;
@@ -21,21 +21,22 @@ namespace provaProgetto.Controllers
         private GestioneDati g;
         private GestioneUtente gUtenti;
 
-        public GestionePrenotazioniController(ILogger<GestionePrenotazioniController> logger, IConfiguration configuration, 
+        public GestionePrenotazioniController(ILogger<GestionePrenotazioniController> logger, IConfiguration configuration,
             IHttpContextAccessor httpContextAccessor)
-		{
-			_logger = logger;
-			_configuration = configuration;
+        {
+            _logger = logger;
+            _configuration = configuration;
             _context = httpContextAccessor.HttpContext!;
             g = new GestioneDati(_configuration);
             gUtenti = new GestioneUtente(_configuration);
-		}
+        }
 
         [HttpGet("utenti/{id}")]
         public IActionResult GetUtente(int id)
         {
             Utente? user = gUtenti.FindUtente(id);
-            if (user != null) {
+            if (user != null)
+            {
                 return Ok(user!);
             }
             else
@@ -48,8 +49,8 @@ namespace provaProgetto.Controllers
         public IActionResult getAppuntamento(int idAppuntamento)
         {
             //Utente user = (Utente)_context.Items["user"];
-            Appuntamento a = g.GetAppuntamento(idAppuntamento)!;
-            if(a!=null)
+            Appuntamento a = g.GetAppuntamento(idAppuntamento);
+            if (a != null)
             {
                 return Ok(a.id);
             }
@@ -61,8 +62,7 @@ namespace provaProgetto.Controllers
         [HttpGet("appuntamenti")]
         public IActionResult ListaAppuntamenti()
         {
-            var user = (Utente)_context.Items["user"]!;
-            var listaApp = g.ListaAppuntamenti(user.id);
+            var listaApp = g.ListaAppuntamenti();
             return Ok(listaApp);
         }
 
@@ -77,7 +77,7 @@ namespace provaProgetto.Controllers
             }
             else
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,"Errore inserimento");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Errore inserimento");
             }
 
         }
@@ -129,24 +129,43 @@ namespace provaProgetto.Controllers
         [HttpGet("futureBookings")]
         public IActionResult ListaAppuntamentiPast()
         {
-            var user = (Utente)_context.Items["user"]!;
-            var listaApp = g.futureBookings(user.id);
+            var listaApp = g.futureBookings();
             return Ok(listaApp);
         }
         [HttpGet("pastBookings")]
         public IActionResult ListaAppuntamentiFuture()
         {
-            var user = (Utente)_context.Items["user"]!;
-            var listaApp = g.pastBookings(user.id);
-            return Ok(listaApp);
+            var listaApp = g.pastBookings();
+            List<object> ris = new List<object>();
+            foreach (Appuntamento app in listaApp)
+            {
+                Utente user = gUtenti.FindUtente(app.idUtente)!;
+                Evento ev = g.GetEvento(app.idEvento)!;
+
+                ris.Add(new
+                {
+                    id = app.id,
+                    title = ev.nome,
+                    start = ev.data,
+                    end = ev.data.AddMinutes(ev.durata),
+                    organizer = new
+                    {
+                        name = user.nome,
+                        surname = user.cognome,
+                        email = user.mail
+                    }
+                });
+            }
+
+            return Ok(ris);
         }
 
         //
         [HttpGet("eventi")]
         public IActionResult ListaEventi()
         {
-            var user = (Utente)_context.Items["user"]!;
-            var listaApp = g.ListaAppuntamenti(user.id);
+            var listaApp = g.ListaAppuntamenti();
+            int io = 0;
             return Ok(listaApp);
         }
 
@@ -197,7 +216,7 @@ namespace provaProgetto.Controllers
         {
             Utente? user = gUtenti.FindUtente(id);
 
-            if(user!.VerifiedAt == null)
+            if (user!.VerifiedAt == null)
                 return StatusCode(StatusCodes.Status401Unauthorized, "Email non verificata");
 
             bool esito = gUtenti.ResetPassword(user!.id, newPassword);
@@ -213,9 +232,9 @@ namespace provaProgetto.Controllers
             Utente? user = gUtenti.FindUtente(id);
             if (user!.VerifiedAt == null)
                 return StatusCode(StatusCodes.Status401Unauthorized, "Email non verificata");
-            user.nome = String.IsNullOrEmpty(userData.nome)? user.nome : userData.nome;
-            user.cognome = String.IsNullOrEmpty(userData.cognome)? user.cognome : userData.cognome;
-            user.mail = String.IsNullOrEmpty(userData.email)? user.mail : userData.email;
+            user.nome = String.IsNullOrEmpty(userData.nome) ? user.nome : userData.nome;
+            user.cognome = String.IsNullOrEmpty(userData.cognome) ? user.cognome : userData.cognome;
+            user.mail = String.IsNullOrEmpty(userData.email) ? user.mail : userData.email;
 
             bool esito = gUtenti.UpdateUtente(user!);
             if (esito)
@@ -231,7 +250,12 @@ namespace provaProgetto.Controllers
         //    var listaApp = g.ListaAppuntamenti();
         //    return Ok(listaApp);
         //}
-
+        [HttpGet("partecipants/{idEvento}")]
+        public IActionResult ListaPartecipantsEvent(int idEvento)
+        {
+            var listaApp = g.ListPartecipants(idEvento);
+            return Ok(listaApp);
+        }
 
 
     }
