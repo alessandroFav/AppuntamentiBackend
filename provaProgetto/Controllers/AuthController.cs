@@ -54,10 +54,10 @@ namespace provaProgetto.Controllers
                 return StatusCode(StatusCodes.Status400BadRequest, "Email già utilizzata");
             }
         }
-        [HttpGet("emailVerification/{id}")]
-        public IActionResult EmailVerification(int id)
+        [HttpGet("resendMail")]
+        public IActionResult EmailVerification([FromBody]string email)
         {
-            Utente? user = g.FindUtente(id);
+            Utente? user = g.FindUtente(email);
             if(user != null)
             {
                 if(user!.VerifiedAt == null)
@@ -119,7 +119,13 @@ namespace provaProgetto.Controllers
                     var data = new
                     {
                         accessToken = token,
-                        user = esito.utenteResponse()
+                        user = new
+                        {
+                            email = esito!.mail,
+                            name = esito!.nome,
+                            surname = esito!.cognome,
+                            id = esito!.id
+                        }
                     };
                     return Ok(data);
                 }
