@@ -34,8 +34,8 @@ namespace provaProgetto.Middlewares
                     Appuntamento? app = dataService.GetAppuntamento(Convert.ToInt32(idApp));
                     if (app == null)
                     {
-                        context.Response.StatusCode = 403;
-                        await context.Response.WriteAsync("Forbidden");
+                        context.Response.StatusCode = 404;
+                        await context.Response.WriteAsync("Not found");
                         return;
                     }
                     if(app!.idUtente != user!.id)
@@ -45,22 +45,22 @@ namespace provaProgetto.Middlewares
                         return;
                     }
                 }
-                if(route.Values.TryGetValue("idEvento", out var idEvent))
-                {
-                    Evento? evento = dataService.GetEvento(Convert.ToInt32(idEvent));
-                    if (evento == null)
-                    {
-                        context.Response.StatusCode = 403;
-                        await context.Response.WriteAsync("Forbidden");
-                        return;
-                    }
-                    if (evento!.idOrganizzatore != user!.id)
-                    {
-                        context.Response.StatusCode = 403;
-                        await context.Response.WriteAsync("Forbidden");
-                        return;
-                    }
-                }
+                //if(route.Values.TryGetValue("idEvento", out var idEvent))
+                //{
+                //    Evento? evento = dataService.GetEvento(Convert.ToInt32(idEvent));
+                //    if (evento == null)
+                //    {
+                //        context.Response.StatusCode = 403;
+                //        await context.Response.WriteAsync("Forbidden");
+                //        return;
+                //    }
+                //    if (evento!.idOrganizzatore != user!.id)
+                //    {
+                //        context.Response.StatusCode = 403;
+                //        await context.Response.WriteAsync("Forbidden");
+                //        return;
+                //    }
+                //}
             }
             await _next(context);
         }

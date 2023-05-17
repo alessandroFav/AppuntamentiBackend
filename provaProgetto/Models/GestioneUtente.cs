@@ -36,7 +36,6 @@ namespace provaProgetto.Models
             };
             return con.Query<Utente>(query, param).SingleOrDefault();
         }
-
         public Utente? InserisciUtente(Registrazione u)
         {
             using var con = new MySqlConnection(s);
@@ -97,23 +96,6 @@ namespace provaProgetto.Models
                 return true;
             }
             catch { return false; }
-        }
-
-        public string ComputeSha256Hash(string rawData)
-        {
-            //create SHA256
-            using SHA256 sha256 = SHA256.Create();
-            byte[] passwordBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(rawData));
-            //converto i byte in string
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < passwordBytes.Length; i++)
-            {
-                builder.Append(passwordBytes[i].ToString("x2"));
-                //x = hesadecimal form
-                //2 = 2 characteers
-
-            }
-            return builder.ToString();
         }
 
     }

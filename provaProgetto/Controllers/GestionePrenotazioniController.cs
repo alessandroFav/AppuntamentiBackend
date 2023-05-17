@@ -2,13 +2,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Crypto.Tls;
 using provaProgetto.Attributes;
 using provaProgetto.Middlewares;
 using provaProgetto.Models;
 
 namespace provaProgetto.Controllers
 {
-    [Route("gestione")]
+    [Route("api")]
     [ApiController]
     //[Authorize]
     [provaProgetto.Attributes.Authorize]
@@ -31,205 +32,45 @@ namespace provaProgetto.Controllers
             gUtenti = new GestioneUtente(_configuration);
         }
 
-        [HttpGet("utenti/{id}")]
-        public IActionResult GetUtente(int id)
+        //users
+
+        [HttpGet("users")]
+        public IActionResult GetUtente()
         {
-            Utente? user = gUtenti.FindUtente(id);
+            Utente? user = (Utente?)_context.Items["user"];
             if (user != null)
             {
-                return Ok(user!);
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status404NotFound, "User not found");
-            }
-        }
-
-        [HttpGet("appuntamenti/{idAppuntamento}")]
-        public IActionResult getAppuntamento(int idAppuntamento)
-        {
-            //Utente user = (Utente)_context.Items["user"];
-            Appuntamento a = g.GetAppuntamento(idAppuntamento);
-            if (a != null)
-            {
-                return Ok(a.id);
-            }
-            else
-            {
-                return NotFound();
-            }
-        }
-        [HttpGet("appuntamenti")]
-        public IActionResult ListaAppuntamenti()
-        {
-            var listaApp = g.ListaAppuntamenti();
-            return Ok(listaApp);
-        }
-
-
-        [HttpPost("appuntamenti")]
-        public IActionResult InserisciAppuntamento([FromBody] Appuntamento app)
-        {
-            bool esito = g.InserisciAppuntamento(app);
-            if (esito)
-            {
-                return Ok(esito);
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Errore inserimento");
-            }
-
-        }
-        [HttpPut("appuntamenti/{idAppuntamento}")]
-        public IActionResult UpdateAppuntamento(int idAppuntamento, [FromBody] UpdateAppuntamento a)
-        {
-            bool esito = g.UpdateAppuntamento(idAppuntamento, a);
-            if (esito)
-            {
-                return Ok(esito);
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Errore update");
-            }
-        }
-        [HttpDelete("appuntamenti/{idAppuntamento}")]
-        public IActionResult DeleteAppuntamento(int id)
-        {
-            var listaApp = g.DeleteAppuntamento(id);
-            return Ok(listaApp);
-        }
-        [HttpGet("appuntamenti/{id}")]
-        public IActionResult BookingsUser(int id)
-        {
-            var listaBookings = g.bookingsUser(id);
-            return Ok(listaBookings);
-        }
-        [HttpDelete("appuntamenti/{id}")]
-        public IActionResult DeleteBookings(int id)
-        {
-            var listaApp = g.DeleteAppuntamentiUser(id);
-            return Ok(listaApp);
-        }
-        [HttpPost("appuntamenti/{idEvento}")]
-        public IActionResult InserisciAppuntamentoUser(int idEvento)
-        {
-            Utente u = (Utente)_context.Items["user"]!;
-            bool esito = g.InserisciAppuntamentoUser(idEvento, u);
-            if (esito)
-            {
-                return Ok(esito);
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Errore inserimento");
-            }
-        }
-        [HttpGet("futureBookings")]
-        public IActionResult ListaAppuntamentiPast()
-        {
-            var listaApp = g.futureBookings();
-            return Ok(listaApp);
-        }
-        [HttpGet("pastBookings")]
-        public IActionResult ListaAppuntamentiFuture()
-        {
-            var listaApp = g.pastBookings();
-            List<object> ris = new List<object>();
-            foreach (Appuntamento app in listaApp)
-            {
-                Utente user = gUtenti.FindUtente(app.idUtente)!;
-                Evento ev = g.GetEvento(app.idEvento)!;
-
-                ris.Add(new
+                var ris = new
                 {
-                    id = app.id,
-                    title = ev.nome,
-                    start = ev.data,
-                    end = ev.data.AddMinutes(ev.durata),
-                    organizer = new
-                    {
-                        name = user.nome,
-                        surname = user.cognome,
-                        email = user.mail
-                    }
-                });
+                    name = user!.nome,
+                    surname = user!.cognome,
+                    email = user!.mail
+                };
+                return Ok(ris);
             }
-
-            return Ok(ris);
+            else { return NotFound("User not found"); }
         }
 
-        //
-        [HttpGet("eventi")]
-        public IActionResult ListaEventi()
+        [HttpPatch("users/resetPassword")]
+        public IActionResult ResetPassword([FromBody] string newPassword)
         {
-            var listaApp = g.ListaAppuntamenti();
-            int io = 0;
-            return Ok(listaApp);
-        }
-
-        [HttpPost("eventi")]
-        public IActionResult InserisciEvento([FromBody] Evento e)
-        {
-            bool esito = g.InserisciEvento(e);
-            if (esito)
-            {
-                return Ok(esito);
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Errore inserimento");
-            }
-        }
-
-        [HttpPut("eventi/{idEvento}")]
-        public IActionResult UpdateEvento([FromBody] Evento e)
-        {
-            bool esito = g.UpdateEvento(e);
-            if (esito)
-            {
-                return Ok(esito);
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Errore update");
-            }
-
-        }
-        [HttpGet("events/{id}")]
-        public IActionResult ListaEventiUser(int idUser)
-        {
-            var listaApp = g.ListaEventiUser(idUser);
-            return Ok(listaApp);
-        }
-
-        [HttpDelete("events/{idEvento}")]
-        public IActionResult DeleteEvento(int idEvento)
-        {
-            var listaApp = g.DeleteEvento(idEvento);
-            return Ok(listaApp);
-        }
-
-        [HttpPatch("resetPassword/{id}")]
-        public IActionResult ResetPassword(int id, [FromBody] string newPassword)
-        {
-            Utente? user = gUtenti.FindUtente(id);
+            Utente? user = (Utente?)_context.Items["user"];
 
             if (user!.VerifiedAt == null)
-                return StatusCode(StatusCodes.Status401Unauthorized, "Email non verificata");
+                return StatusCode(StatusCodes.Status401Unauthorized, "Email not verified");
 
             bool esito = gUtenti.ResetPassword(user!.id, newPassword);
             if (esito)
             {
                 return Ok(esito);
             }
-            else { return StatusCode(StatusCodes.Status500InternalServerError, "Errore update"); }
+            else { return StatusCode(StatusCodes.Status500InternalServerError, "Update error"); }
         }
-        [HttpPut("updateUtente/{id}")]
-        public IActionResult UpdateUtente(int id, [FromBody] UpdateUtente userData)
+
+        [HttpPut("users/update")]
+        public IActionResult UpdateUtente([FromBody] UpdateUtente userData)
         {
-            Utente? user = gUtenti.FindUtente(id);
+            Utente? user = (Utente?)_context.Items["user"];
             if (user!.VerifiedAt == null)
                 return StatusCode(StatusCodes.Status401Unauthorized, "Email non verificata");
             user.nome = String.IsNullOrEmpty(userData.nome) ? user.nome : userData.nome;
@@ -241,21 +82,307 @@ namespace provaProgetto.Controllers
             {
                 return Ok(esito);
             }
-            else { return StatusCode(StatusCodes.Status500InternalServerError, "Errore update"); }
+            else { return StatusCode(StatusCodes.Status500InternalServerError, "Update Errore"); }
         }
 
-        //[HttpDelete("eventi/{id}")]
-        //public IActionResult ListaEventi()
-        //{
-        //    var listaApp = g.ListaAppuntamenti();
-        //    return Ok(listaApp);
-        //}
-        [HttpGet("partecipants/{idEvento}")]
-        public IActionResult ListaPartecipantsEvent(int idEvento)
+
+        //bookings
+
+        [HttpGet("bookings/futureBookings")]
+        public IActionResult FutureBookings()
         {
-            var listaApp = g.ListPartecipants(idEvento);
-            return Ok(listaApp);
+            Utente user = (Utente)_context.Items["user"]!;
+            var listaApp = g.futureBookings(user.id);
+            List<object> ris = new List<object>();
+            foreach(Appuntamento app in listaApp)
+            {
+                Evento? evento = g.GetEvento(app.idEvento);
+                if (evento == null)
+                    return NotFound("Enevt not found");
+                Utente owner = gUtenti.FindUtente(evento.idOrganizzatore)!;
+                ris.Add(new
+                {
+                    id = app.id,
+                    title = evento.nome,
+                    start = evento.data,
+                    end = evento.data.AddMinutes(evento.durata),
+                    description = evento.materia,
+                    organizer = new
+                    {
+                        name = owner.nome,
+                        surname = owner.cognome,
+                        email = owner.mail
+                    }
+                });
+            }
+            return Ok(ris);
         }
+
+        [HttpGet("bookings/pastBookings")]
+        public IActionResult PastBookings()
+        {
+            Utente user = (Utente)_context.Items["user"]!;
+            var listaApp = g.pastBookings(user.id);
+            List<object> ris = new List<object>();
+            foreach (Appuntamento app in listaApp)
+            {
+                Evento? evento = g.GetEvento(app.idEvento);
+                if (evento == null)
+                    return NotFound("Event not found");
+                Utente owner = gUtenti.FindUtente(app.idUtente)!;
+
+                ris.Add(new
+                {
+                    id = app.id,
+                    title = evento.nome,
+                    start = evento.data,
+                    end = evento.data.AddMinutes(evento.durata),
+                    organizer = new
+                    {
+                        name = owner.nome,
+                        surname = owner.cognome,
+                        email = owner.mail
+                    }
+                });
+            }
+
+            return Ok(ris);
+        }
+
+        [HttpGet("bookings/{idAppuntamento}")]
+        public IActionResult getAppuntamento(int idAppuntamento)
+        {
+            Appuntamento? app = g.GetAppuntamento(idAppuntamento);
+            if (app != null)
+            {
+                Evento? evento = g.GetEvento(app.idEvento);
+                if (evento == null)
+                    return NotFound("Event not found");
+
+                Utente owner = gUtenti.FindUtente(app.idUtente)!;
+                return Ok(new
+                {
+                    id = app.id,
+                    title = evento.nome,
+                    start = evento.data,
+                    end = evento.data.AddMinutes(evento.durata),
+                    description = evento.materia,
+                    organizer = new
+                    {
+                        name = owner.nome,
+                        surname = owner.cognome,
+                        email = owner.mail
+                    }
+                });
+            }
+            else { return NotFound("Booking not found"); }
+        }
+
+        [HttpGet("bookings/all")]
+        public IActionResult ListaAppuntamenti()
+        {
+            Utente user = (Utente)_context.Items["user"]!;
+            var listaApp = g.ListaAppuntamenti(user.id);
+            List<object> ris = new List<object>();
+            foreach (Appuntamento app in listaApp)
+            {
+                Evento? evento = g.GetEvento(app.idEvento);
+                if (evento == null)
+                    return NotFound("Event not found");
+                Utente owner = gUtenti.FindUtente(app.idUtente)!;
+
+                ris.Add(new
+                {
+                    id = app.id,
+                    title = evento.nome,
+                    start = evento.data,
+                    end = evento.data.AddMinutes(evento.durata),
+                    organizer = new
+                    {
+                        name = owner.nome,
+                        surname = owner.cognome,
+                        email = owner.mail
+                    }
+                });
+            }
+
+            return Ok(ris);
+        }
+
+        [HttpPost("bookings/{idEvento}")]
+        public IActionResult InserisciAppuntamentoUser(int idEvento)
+        {
+            Utente user = (Utente)_context.Items["user"]!;
+            bool esito = g.InserisciAppuntamentoUser(idEvento, user);
+            if (esito)
+            {
+                return Ok(esito);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Errore inserimento");
+            }
+        }
+
+        [HttpDelete("bookings/{idAppuntamento}")]
+        public IActionResult DeleteAppuntamento(int idAppuntamento)
+        {
+            bool esito = g.DeleteAppuntamento(idAppuntamento);
+            if (esito)
+            {
+                return Ok(true);
+            }
+            else { return StatusCode(StatusCodes.Status500InternalServerError, "Delete error"); }
+        }
+
+        [HttpDelete("bookings")]
+        public IActionResult DeleteBookings()
+        {
+            Utente user = (Utente)_context.Items["user"]!;
+            bool esito = g.DeleteAllBookings(user.id);
+            if (esito)
+            {
+                return Ok(true);
+            }
+            else { return StatusCode(StatusCodes.Status500InternalServerError, "Delete errore"); }
+        }
+
+
+        //events
+
+        [HttpGet("events")]
+        public IActionResult ListaEventi()
+        {
+            Utente user = (Utente)_context.Items["user"]!;
+            var listaEventi = g.ListaEventi(user.id);
+            List<object> ris = new List<object>();
+            foreach (Evento e in listaEventi)
+            {
+                ris.Add(new
+                {
+                    id = e.id,
+                    title = e.nome,
+                    start = e.data,
+                    end = e.data.AddMinutes(e.durata),
+                    description = e.materia,
+                    nPartecipants = e.nPartecipanti,
+                    maxPartecipants = e.numPosti
+                });
+            }
+
+            return Ok(ris);
+        }
+
+        [HttpPost("events/{idEvento}")]
+        public IActionResult getEvento(int idEvento)
+        {
+            Evento? evento = g.GetEvento(idEvento);
+            if (evento != null)
+            {
+                return Ok(new
+                {
+                    id = evento.id,
+                    title = evento.nome,
+                    start = evento.data,
+                    end = evento.data.AddMinutes(evento.durata),
+                    description = evento.materia,
+                    nPartecipants = evento.nPartecipanti,
+                    maxPartecipants = evento.numPosti
+                });
+            }
+            else { return NotFound("Event not found"); }
+        }
+
+        [HttpDelete("events/{idEvento}")]
+        public IActionResult DeleteEvento(int idEvento)
+        {
+            bool esito = g.DeleteEvento(idEvento);
+            if (esito)
+            {
+                return Ok(true);
+            }
+            else { return StatusCode(StatusCodes.Status500InternalServerError, "Delete error"); }
+        }
+
+        [HttpPut("events/{idEvento}")]
+        public IActionResult UpdateEvento(int idEvento, [FromBody] UpdateEvento userData)
+        {
+            Evento? evento = g.GetEvento(idEvento);
+            if (evento == null)
+                return NotFound("Event not found");
+
+            evento.nome = String.IsNullOrEmpty(userData.title) ? evento.nome : userData.title;
+            evento.materia = String.IsNullOrEmpty(userData.description) ? evento.materia : userData.description;
+            evento.data = userData.start == null ? evento.data : (DateTime)userData.start;
+            evento.durata = userData.end == null ? evento.durata : Convert.ToInt32((userData.end! - userData.start).Value.TotalMinutes);
+            evento.numPosti = userData.maxParticipants == null ? evento.numPosti : (int)userData.maxParticipants;
+
+            bool esito = g.UpdateEvento(evento);
+            if (esito)
+            {
+                return Ok(new
+                {
+                    id = evento.id,
+                    title = evento.nome,
+                    start = evento.data,
+                    end = evento.data.AddMinutes(evento.durata),
+                    description = evento.materia,
+                    nPartecipants = evento.nPartecipanti,
+                    maxPartecipants = evento.numPosti
+                });
+            }
+            else { return StatusCode(StatusCodes.Status500InternalServerError, "Update Errore"); }
+        }
+
+        [HttpPost("events")]
+        public IActionResult InserisciEvento([FromBody] UpdateEvento userData)
+        {
+            Utente user = (Utente)_context.Items["user"]!;
+
+            Evento evento = new Evento()
+            {
+                nome = userData.title!,
+                materia = userData.description!,
+                data = (DateTime)userData.start!,
+                durata = Convert.ToInt32((userData.end! - userData.start!).Value.TotalMinutes),
+                idOrganizzatore = user.id,
+                numPosti = (int)userData.maxParticipants!,
+                nPartecipanti = 0
+            };
+            bool esito = g.InserisciEvento(evento);
+            if (esito)
+            {
+                return Ok(esito);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Errore inserimento");
+            }
+        }
+
+
+        //participants
+
+        [HttpGet("participants/{idEvento}")]
+        public IActionResult getParticipantsEvent(int idEvento)
+        {
+            var participants = g.ListPartecipants(idEvento);
+            List<object> ris = new List<object>();
+            foreach (Utente user in participants)
+            {
+                ris.Add(new
+                {
+                    id = user.id,
+                    name = user.nome,
+                    surname = user.cognome,
+                    email = user.mail
+                });
+            }
+
+            return Ok(ris);
+
+        }
+        
 
 
     }

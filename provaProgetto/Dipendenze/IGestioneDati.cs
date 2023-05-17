@@ -1,14 +1,21 @@
-﻿using provaProgetto.Models;
+﻿using MySql.Data.MySqlClient;
+using provaProgetto.Models;
 namespace provaProgetto.Dipendenze
 {
     public interface IGestioneDati
     {
-        public bool InserisciAppuntamento(Appuntamento a);
+        public List<Appuntamento> futureBookings(int userId);
+        public List<Appuntamento> pastBookings(int userId);
+        public List<Appuntamento> ListaAppuntamenti(int userId);
         public Appuntamento? GetAppuntamento(int id);
-        public IEnumerable<Appuntamento> ListaAppuntamenti(int userId);
-        public IEnumerable<Evento> ListaEventi(int userId);
-        public bool InserisciEvento(Evento e);
-        public bool UpdateEvento(Evento e);
+        public bool InserisciAppuntamentoUser(int idEvento, Utente u);
+        public bool DeleteAppuntamento(int id);
+        public bool DeleteAllBookings(int id);
+        public List<Evento> ListaEventi(int id);
         public Evento? GetEvento(int id);
+        public bool DeleteEvento(int id);
+        public bool UpdateEvento(Evento e);
+        public bool InserisciEvento(Evento e);
+        public List<Utente> ListPartecipants(int id);
     }
 }

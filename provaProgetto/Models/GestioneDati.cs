@@ -16,8 +16,43 @@ namespace provaProgetto.Models
             s = configuration.GetConnectionString("progettoConnection")!;
         }
 
-		//CRUD appuntamenti
 
+
+		//appuntamenti
+        public List<Appuntamento> futureBookings(int userId)
+        {
+            using var con = new MySqlConnection(s);
+            var query = "SELECT appuntamenti.* FROM appuntamenti " +
+                "INNER JOIN eventi on appuntamenti.idEvento=eventi.id WHERE data>='@today' AND utenti.id=@userId";
+            var param = new
+            {
+                today = DateTime.Now,
+                userId = userId
+            };
+            return con.Query<Appuntamento>(query, param).ToList();
+        }
+        public List<Appuntamento> pastBookings(int userId)
+        {
+            using var con = new MySqlConnection(s);
+            var query = "SELECT appuntamenti.* FROM appuntamenti " +
+                "INNER JOIN eventi on appuntamenti.idEvento=eventi.id WHERE data>='@today' AND utenti.id=@userId";
+            var param = new
+            {
+                today = DateTime.Now,
+                userId = userId
+            };
+            return con.Query<Appuntamento>(query).ToList();
+        }
+        public List<Appuntamento> ListaAppuntamenti(int userId)
+        {
+            using var con = new MySqlConnection(s);
+            var query ="SELECT * from appuntamenti WHERE idUtente = @userId";
+            var param = new
+            {
+                userId = userId
+            };
+            return con.Query<Appuntamento>(query, param).ToList();
+        }
         public Appuntamento? GetAppuntamento(int id)
         {
             using var con = new MySqlConnection(s);
@@ -28,40 +63,6 @@ namespace provaProgetto.Models
             };
             return con.Query<Appuntamento>(query, param).FirstOrDefault();
         }
-
-        public IEnumerable<Appuntamento> ListaAppuntamenti(int userId)
-        {
-            using var con = new MySqlConnection(s);
-            var query ="SELECT * from appuntamenti WHERE idUtente = @userId";
-            var param = new
-            {
-                userId = userId
-            };
-            return con.Query<Appuntamento>(query);
-        }
-        public bool InserisciAppuntamento(Appuntamento a)
-        {
-            using var con = new MySqlConnection(s);
-            var query = @"INSERT INTO appuntamenti(idEvento, idUtente, dataPrenotazione) VALUES(@idEv,@idUser,@data)";
-            var param = new
-            {
-                idEv = a.idEvento,
-                idUser = a.idUtente,
-                data = a.dataPrenotazione,
-            };
-            bool esito;
-            try
-            {
-                con.Execute(query, param);
-                esito = true;
-            }
-            catch (Exception e)
-            {
-                esito = false;
-            }
-            return esito;
-        }
-
         public bool InserisciAppuntamentoUser(int idEvento, Utente u)
         {
             using var con = new MySqlConnection(s);
@@ -73,82 +74,34 @@ namespace provaProgetto.Models
                 data = DateTime.Now.ToString("yyyyMMdd") + "T" + DateTime.Now.ToString("HHmmss"),
             };
             //0001-01-01 00:00:00
-            string q1 = "SELECT * from eventi WHERE id=" + idEvento;
-            IEnumerable<Evento> e = con.Query<Evento>(q1);
-            Evento considerato = e.ToList()[0];
-            bool esito;
-            if (considerato.nPartecipanti + 1 <= considerato.numPosti)
-            {
-                try
-                {
-                    con.Execute(query, param);
-                    esito = true;
-                }
-                catch (Exception ex)
-                {
-                    esito = false;
-                }
-            }
-            else
-            {
-                esito = false;
-            }
+            Evento evento = GetEvento(idEvento)!;
+            if (evento.nPartecipanti + 1 > evento.numPosti)
+                return false;
 
-            return esito;
-
-        }
-
-        public bool UpdateAppuntamento(int id, UpdateAppuntamento a)
-        {
-            using var con = new MySqlConnection(s);
-            var query = "UPDATE appuntamenti SET @idEv,@idUser,@data" +
-                "WHERE id=@id";
-            var param = new
-            {
-                idEv = a.idEvento,
-                idUser = a.idUtente,
-                data = a.dataPrenotazione,
-            };
-            bool esito;
             try
             {
                 con.Execute(query, param);
-                esito = true;
+                return true;
             }
-            catch (Exception err)
-            {
-                esito = false;
-            }
-            return esito;
-        }
+            catch { return false; }
 
+        }
         public bool DeleteAppuntamento(int id)
         {
             using var con = new MySqlConnection(s);
             var query = "DELETE from appuntamenti WHERE id=@idAppuntamento";
             var param = new { idAppuntamento = id };
-            bool esito;
             try
             {
                 con.Execute(query, param);
-                esito = true;
+                return true;
             }
-            catch (Exception err)
+            catch
             {
-                esito = false;
+                return false;
             }
-            return esito;
         }
-
-        public List<Appuntamento> bookingsUser(int id)
-        {
-            using var con = new MySqlConnection(s);
-            var query = "SELECT * from appuntamenti where idUtente=@userId";
-            var param = new { userId = id };
-            return con.Query<Appuntamento>(query, param).ToList();
-
-        }
-        public bool DeleteAppuntamentiUser(int id)
+        public bool DeleteAllBookings(int id)
         {
             using var con = new MySqlConnection(s);
             var query = "DELETE from appuntamenti WHERE idUtente=@userId";
@@ -164,33 +117,8 @@ namespace provaProgetto.Models
             }
         }
 
-        public List<Appuntamento> futureBookings(int userId)
-        {
-            using var con = new MySqlConnection(s);
-            var query = "SELECT appuntamenti.id, appuntamenti.idEvento,appuntamenti.idUtente,appuntamenti.dataPrenotazione FROM appuntamenti " +
-                "INNER JOIN eventi on appuntamenti.idEvento=eventi.id WHERE data>='@today' AND utenti.id=@userId";
-            var param = new
-            {
-                today = DateTime.Now,
-                userId = userId
-            };
-            return con.Query<Appuntamento>(query, param).ToList();
-        }
 
-        public List<Appuntamento> pastBookings(int userId)
-        {
-            using var con = new MySqlConnection(s);
-            var query = "SELECT appuntamenti.id, appuntamenti.idEvento,appuntamenti.idUtente,appuntamenti.dataPrenotazione FROM appuntamenti " +
-                "INNER JOIN eventi on appuntamenti.idEvento=eventi.id WHERE data>='@today' AND utenti.id=@userId";
-            var param = new
-            {
-                today = DateTime.Now,
-                userId = userId
-            };
-            return con.Query<Appuntamento>(query).ToList();
-        }
-
-        //CRUD eventi
+        //eventi
         public List<Evento> ListaEventi(int id)
         {
             using var con = new MySqlConnection(s);
@@ -201,21 +129,21 @@ namespace provaProgetto.Models
             };
             return con.Query<Evento>(query, param).ToList();
         }
-
-        public bool InserisciEvento(Evento e)
+        public Evento? GetEvento(int id)
         {
-            using var con = new MySqlConnection(s);
-            var query = @"INSERT INTO eventi(nome,materia,data,idOrganizzatore,numPosti,durata,nPartecipanti) VALUES(@name,@mat,@date,@idOrg,@nPosti,@dur,@partecipanti)";
+            using var conn = new MySqlConnection(s);
+            var query = "SELECT * from eventi WHERE id=@idEvento";
             var param = new
             {
-                name = e.nome,
-                mat = e.materia,
-                date = e.data,
-                idOrg = e.idOrganizzatore,
-                nPosti = e.numPosti,
-                dur = e.data,
-                partecipanti=e.nPartecipanti
+                idEvento = id
             };
+            return conn.Query<Evento>(query, param).FirstOrDefault();
+        }
+        public bool DeleteEvento(int id)
+        {
+            using var con = new MySqlConnection(s);
+            var query = "DELETE from eventi WHERE id=@idEvento";
+            var param = new { idEvento = id };
             try
             {
                 con.Execute(query, param);
@@ -226,7 +154,6 @@ namespace provaProgetto.Models
                 return false;
             }
         }
-
         public bool UpdateEvento(Evento e)
         {
             using var con = new MySqlConnection(s);
@@ -254,45 +181,30 @@ namespace provaProgetto.Models
                 return false;
             }
         }
-        public Evento? GetEvento(int id)
-        {
-            using var conn = new MySqlConnection(s);
-            var query = "SELECT * from eventi WHERE id=@idEvento";
-            var param = new
-            {
-                idEvento = id
-            };
-            return conn.Query<Evento>(query, param).FirstOrDefault();
-        }
-
-        public bool DeleteEvento(int id)
+        public bool InserisciEvento(Evento e)
         {
             using var con = new MySqlConnection(s);
-            var query = "DELETE from eventi WHERE id=@idEvento";
-            var param = new { idEvento = id };
+            var query = @"INSERT INTO eventi(nome,materia,data,idOrganizzatore,numPosti,durata,nPartecipanti) VALUES(@name,@mat,@date,@idOrg,@nPosti,@dur,@partecipanti)";
+            var param = new
+            {
+                name = e.nome,
+                mat = e.materia,
+                date = e.data,
+                idOrg = e.idOrganizzatore,
+                nPosti = e.numPosti,
+                dur = e.data,
+                partecipanti=e.nPartecipanti
+            };
             try
             {
                 con.Execute(query, param);
                 return true;
             }
-            catch
-            {
-                return false;
-            }
+            catch{ return false;}
         }
 
-        public List<Evento> ListaEventiUser(int id)
-        {
-            using var con = new MySqlConnection(s);
-            var query = "SELECT eventi.* " +
-                "FROM eventi inner join appuntamenti on eventi.id = appuntamenti.idEvento " +
-                "WHERE idUtente=@userId";
-            var param = new
-            {
-                userId = id
-            };
-            return con.Query<Evento>(query, param).ToList();
-        }
+
+        //participants
 
         public List<Utente> ListPartecipants(int id)
         {
