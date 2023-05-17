@@ -54,17 +54,18 @@ namespace provaProgetto.Controllers
                 return StatusCode(StatusCodes.Status400BadRequest, "Email già utilizzata");
             }
         }
-        [HttpGet("resendMail")]
-        public IActionResult EmailVerification([FromBody]string email)
+
+        [HttpPost("resendMail")]
+        public IActionResult EmailVerification([FromBody] EmailBody body)
         {
-            Utente? user = g.FindUtente(email);
+            Utente? user = g.FindUtente(body.email);
             if(user != null)
             {
                 if(user!.VerifiedAt == null)
                 {
                     string baseURL = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}";
                     gMail.SendMailVerificationAsync(user!.id, baseURL);
-                    return Ok(true);
+                    return Ok("Mail inviata correttamente");
                 }
                 else
                 {
@@ -76,6 +77,7 @@ namespace provaProgetto.Controllers
                 return StatusCode(StatusCodes.Status404NotFound, "Utente non trovato");
             }
         }
+
         [HttpGet("verificaEmail/{id}")]
         public IActionResult VerificaEmail(int id)
         {
@@ -139,6 +141,11 @@ namespace provaProgetto.Controllers
                 return StatusCode(StatusCodes.Status404NotFound, "Utente non trovato");
             }
         }
+    }
+
+    public class EmailBody
+    {
+        public string email { get; set; }
     }
 }
 

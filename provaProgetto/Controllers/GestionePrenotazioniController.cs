@@ -34,10 +34,10 @@ namespace provaProgetto.Controllers
 
         //users
 
-        [HttpGet("users")]
-        public IActionResult GetUtente()
+        [HttpGet("users/{id}")]
+        public IActionResult GetUtente(int id)
         {
-            Utente? user = (Utente?)_context.Items["user"];
+            Utente? user = gUtenti.FindUtente(id);
             if (user != null)
             {
                 var ris = new
@@ -51,15 +51,10 @@ namespace provaProgetto.Controllers
             else { return NotFound("User not found"); }
         }
 
-        [HttpPatch("users/resetPassword")]
-        public IActionResult ResetPassword([FromBody] string newPassword)
+        [HttpPatch("users/resetPassword/{id}")]
+        public IActionResult ResetPassword(int id,[FromBody] PasswordBody body)
         {
-            Utente? user = (Utente?)_context.Items["user"];
-
-            if (user!.VerifiedAt == null)
-                return StatusCode(StatusCodes.Status401Unauthorized, "Email not verified");
-
-            bool esito = gUtenti.ResetPassword(user!.id, newPassword);
+            bool esito = gUtenti.ResetPassword(id, body.password);
             if (esito)
             {
                 return Ok(esito);
@@ -120,7 +115,7 @@ namespace provaProgetto.Controllers
 
         [HttpGet("bookings/pastBookings")]
         public IActionResult PastBookings()
-        {
+        { 
             Utente user = (Utente)_context.Items["user"]!;
             var listaApp = g.pastBookings(user.id);
             List<object> ris = new List<object>();
@@ -273,7 +268,7 @@ namespace provaProgetto.Controllers
             return Ok(ris);
         }
 
-        [HttpPost("events/{idEvento}")]
+        [HttpGet("events/{idEvento}")]
         public IActionResult getEvento(int idEvento)
         {
             Evento? evento = g.GetEvento(idEvento);
@@ -385,6 +380,11 @@ namespace provaProgetto.Controllers
         
 
 
+    }
+
+    public class PasswordBody
+    {
+        public string password { get; set; }
     }
 }
 

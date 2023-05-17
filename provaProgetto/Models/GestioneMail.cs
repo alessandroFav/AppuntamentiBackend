@@ -29,7 +29,7 @@ namespace provaProgetto.Models
             {
                 var client = new SmtpClient("sandbox.smtp.mailtrap.io", 2525)
                 {
-                    Credentials = new NetworkCredential("0c401e50958023", "fbefeeaf03e1f6"),
+                    Credentials = new NetworkCredential("28e1e56a0a484e", "350d3167a23d24"),
                     EnableSsl = true
                 };
 

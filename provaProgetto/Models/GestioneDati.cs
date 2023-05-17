@@ -23,7 +23,7 @@ namespace provaProgetto.Models
         {
             using var con = new MySqlConnection(s);
             var query = "SELECT appuntamenti.* FROM appuntamenti " +
-                "INNER JOIN eventi on appuntamenti.idEvento=eventi.id WHERE data>='@today' AND utenti.id=@userId";
+                "INNER JOIN eventi on appuntamenti.idEvento=eventi.id WHERE data>='@today' AND appuntamenti.idUtente=@userId";
             var param = new
             {
                 today = DateTime.Now,
@@ -35,13 +35,13 @@ namespace provaProgetto.Models
         {
             using var con = new MySqlConnection(s);
             var query = "SELECT appuntamenti.* FROM appuntamenti " +
-                "INNER JOIN eventi on appuntamenti.idEvento=eventi.id WHERE data>='@today' AND utenti.id=@userId";
+                "INNER JOIN eventi on appuntamenti.idEvento=eventi.id WHERE data>='@today' AND appuntamenti.idUtente=@userId";
             var param = new
             {
                 today = DateTime.Now,
                 userId = userId
             };
-            return con.Query<Appuntamento>(query).ToList();
+            return con.Query<Appuntamento>(query, param).ToList();
         }
         public List<Appuntamento> ListaAppuntamenti(int userId)
         {
@@ -157,7 +157,8 @@ namespace provaProgetto.Models
         public bool UpdateEvento(Evento e)
         {
             using var con = new MySqlConnection(s);
-            var query = "UPDATE eventi SET nome=@name,materia=@mat,data=@date,idOrganizzatore=@idOrd,numPosti=@nP,durata=@dur,nPartecipanti=@part"+
+
+            var query = "UPDATE eventi SET nome=@name,materia=@mat,data=@date,idOrganizzatore=@idOrd,numPosti=@nPosti,durata=@dur,nPartecipanti=@partecipanti "+
                 "WHERE id=@idEvento";
             var param = new
             {
@@ -165,9 +166,9 @@ namespace provaProgetto.Models
                 name = e.nome,
                 mat = e.materia,
                 date = e.data,
-                idOrg = e.idOrganizzatore,
+                idOrd = e.idOrganizzatore,
                 nPosti = e.numPosti,
-                dur = e.data,
+                dur = e.durata,
                 partecipanti = e.nPartecipanti
 
             };
@@ -176,7 +177,7 @@ namespace provaProgetto.Models
                 con.Execute(query, param);
                 return true;
             }
-            catch
+            catch(Exception error)
             {
                 return false;
             }
@@ -192,7 +193,7 @@ namespace provaProgetto.Models
                 date = e.data,
                 idOrg = e.idOrganizzatore,
                 nPosti = e.numPosti,
-                dur = e.data,
+                dur = e.durata,
                 partecipanti=e.nPartecipanti
             };
             try
@@ -200,7 +201,7 @@ namespace provaProgetto.Models
                 con.Execute(query, param);
                 return true;
             }
-            catch{ return false;}
+            catch(Exception error){ return false;}
         }
 
 
