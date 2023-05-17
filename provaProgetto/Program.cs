@@ -12,6 +12,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorTemplating();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "corsPolicy",
+                      policy =>
+                      {
+                          policy.WithOrigins("https://localhost:7261", "http://localhost:5173").AllowAnyMethod().AllowAnyHeader();
+                      });
+});
 
 //var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]);
 
@@ -50,6 +58,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseCors("corsPolicy");
 
 app.UseAuthorization();
 

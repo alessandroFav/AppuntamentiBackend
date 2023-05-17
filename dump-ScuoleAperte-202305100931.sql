@@ -17,52 +17,6 @@
 CREATE DATABASE IF NOT EXISTS `scuoleaperte` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
 USE `scuoleaperte`;
 
--- Dump della struttura di tabella scuoleaperte.appuntamenti
-CREATE TABLE IF NOT EXISTS `appuntamenti` (
-  `id` float NOT NULL AUTO_INCREMENT,
-  `idEvento` int(11) DEFAULT NULL,
-  `idUtente` int(11) DEFAULT NULL,
-  `dataPrenotazione` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `appuntamenti_FK` (`idEvento`),
-  KEY `appuntamenti_FK_1` (`idUtente`),
-  CONSTRAINT `appuntamenti_FK` FOREIGN KEY (`idEvento`) REFERENCES `eventi` (`id`),
-  CONSTRAINT `appuntamenti_FK_1` FOREIGN KEY (`idUtente`) REFERENCES `utenti` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
-
--- Dump dei dati della tabella scuoleaperte.appuntamenti: ~2 rows (circa)
-/*!40000 ALTER TABLE `appuntamenti` DISABLE KEYS */;
-/*!40000 ALTER TABLE `appuntamenti` ENABLE KEYS */;
-
--- Dump della struttura di tabella scuoleaperte.calendario
-CREATE TABLE IF NOT EXISTS `calendario` (
-  `data` datetime NOT NULL,
-  PRIMARY KEY (`data`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- Dump dei dati della tabella scuoleaperte.calendario: ~0 rows (circa)
-/*!40000 ALTER TABLE `calendario` DISABLE KEYS */;
-/*!40000 ALTER TABLE `calendario` ENABLE KEYS */;
-
--- Dump della struttura di tabella scuoleaperte.eventi
-CREATE TABLE IF NOT EXISTS `eventi` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `nome` varchar(100) DEFAULT NULL,
-  `materia` varchar(100) DEFAULT NULL,
-  `data` datetime DEFAULT NULL,
-  `idOrganizzatore` int(11) DEFAULT NULL,
-  `numPosti` int(11) DEFAULT NULL,
-  `durata` int(11) DEFAULT NULL,
-  `nPartecipanti` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `eventi_FK` (`idOrganizzatore`),
-  CONSTRAINT `eventi_FK` FOREIGN KEY (`idOrganizzatore`) REFERENCES `utenti` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
-
--- Dump dei dati della tabella scuoleaperte.eventi: ~0 rows (circa)
-/*!40000 ALTER TABLE `eventi` DISABLE KEYS */;
-/*!40000 ALTER TABLE `eventi` ENABLE KEYS */;
-
 -- Dump della struttura di tabella scuoleaperte.utenti
 CREATE TABLE IF NOT EXISTS `utenti` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -86,3 +40,55 @@ INSERT INTO `utenti` (`id`, `nome`, `cognome`, `mail`, `password`, `VerifiedAt`)
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
+
+-- Dump della struttura di tabella scuoleaperte.eventi
+CREATE TABLE IF NOT EXISTS `eventi` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(100) DEFAULT NULL,
+  `materia` varchar(100) DEFAULT NULL,
+  `data` datetime DEFAULT NULL,
+  `idOrganizzatore` int(11) DEFAULT NULL,
+  `numPosti` int(11) DEFAULT NULL,
+  `durata` int(11) DEFAULT NULL,
+  `nPartecipanti` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `eventi_FK` (`idOrganizzatore`),
+  CONSTRAINT `eventi_FK` FOREIGN KEY (`idOrganizzatore`) REFERENCES `utenti` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+-- Dump dei dati della tabella scuoleaperte.eventi: ~0 rows (circa)
+/*!40000 ALTER TABLE `eventi` DISABLE KEYS */;
+/*!40000 ALTER TABLE `eventi` ENABLE KEYS */;
+
+-- Dump della struttura di tabella scuoleaperte.appuntamenti
+CREATE TABLE IF NOT EXISTS `appuntamenti` (
+  `id` float NOT NULL AUTO_INCREMENT,
+  `idEvento` int(11) DEFAULT NULL,
+  `idUtente` int(11) DEFAULT NULL,
+  `dataPrenotazione` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `appuntamenti_FK` (`idEvento`),
+  KEY `appuntamenti_FK_1` (`idUtente`),
+  CONSTRAINT `appuntamenti_FK` FOREIGN KEY (`idEvento`) REFERENCES `eventi` (`id`),
+  CONSTRAINT `appuntamenti_FK_1` FOREIGN KEY (`idUtente`) REFERENCES `utenti` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+
+-- Dump dei dati della tabella scuoleaperte.appuntamenti: ~2 rows (circa)
+/*!40000 ALTER TABLE `appuntamenti` DISABLE KEYS */;
+/*!40000 ALTER TABLE `appuntamenti` ENABLE KEYS */;
+
+
+
+-- Dump della struttura di tabella scuoleaperte.calendario
+CREATE TABLE IF NOT EXISTS `calendario` (
+  `data` datetime NOT NULL,
+  PRIMARY KEY (`data`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Dump dei dati della tabella scuoleaperte.calendario: ~0 rows (circa)
+/*!40000 ALTER TABLE `calendario` DISABLE KEYS */;
+/*!40000 ALTER TABLE `calendario` ENABLE KEYS */;
+
+
+
+

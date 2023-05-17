@@ -5,8 +5,8 @@ namespace provaProgetto.Dipendenze
     {
         public bool InserisciAppuntamento(Appuntamento a);
         public Appuntamento? GetAppuntamento(int id);
-        public IEnumerable<Appuntamento> ListaAppuntamenti();
-        public IEnumerable<Evento> ListaEventi();
+        public IEnumerable<Appuntamento> ListaAppuntamenti(int userId);
+        public IEnumerable<Evento> ListaEventi(int userId);
         public bool InserisciEvento(Evento e);
         public bool UpdateEvento(Evento e);
         public Evento? GetEvento(int id);

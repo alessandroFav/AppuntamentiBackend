@@ -87,7 +87,7 @@ namespace provaProgetto.Controllers
                     user.VerifiedAt = DateTime.Now;
                     if (g.UpdateUtente(user!))
                     {
-                        return Ok(true);
+                        return Ok("Email verificata correttamente");
                     }
                     else
                     {
@@ -116,7 +116,12 @@ namespace provaProgetto.Controllers
                 if(BC.Verify(userData.password, esito!.password))
                 {
                     var token = jwt.GenerateJwtToken(esito!);
-                    return Ok(token);
+                    var data = new
+                    {
+                        accessToken = token,
+                        user = esito.utenteResponse()
+                    };
+                    return Ok(data);
                 }
                 else
                 {

@@ -28,10 +28,14 @@ namespace provaProgetto.Models
             return con.Query<Appuntamento>(query, param).FirstOrDefault();
         }
 
-        public IEnumerable<Appuntamento> ListaAppuntamenti()
+        public IEnumerable<Appuntamento> ListaAppuntamenti(int userId)
         {
             using var con = new MySqlConnection(s);
-            var query ="SELECT * from appuntamenti";
+            var query ="SELECT * from appuntamenti WHERE idUtente = @userId";
+            var param = new
+            {
+                userId = userId
+            };
             return con.Query<Appuntamento>(query);
         }
         public bool InserisciAppuntamento(Appuntamento a)
@@ -160,32 +164,46 @@ namespace provaProgetto.Models
             return esito;
         }
 
-        public List<Appuntamento> futureBookings()
+        public List<Appuntamento> futureBookings(int userId)
         {
             using var con = new MySqlConnection(s);
             DateTime today = DateTime.Now;
             var query = "SELECT appuntamenti.id, appuntamenti.idEvento,appuntamenti.idUtente,appuntamenti.dataPrenotazione FROM appuntamenti " +
-                "INNER JOIN eventi on appuntamenti.idEvento=eventi.id WHERE data>='" + today.ToString("yyyyMMdd") + "'";
-            IEnumerable<Appuntamento> app = con.Query<Appuntamento>(query);
+                "INNER JOIN eventi on appuntamenti.idEvento=eventi.id WHERE data>='@today' AND utenti.id=@userId";
+            var param = new
+            {
+                today = today,
+                userId = userId
+            };
+            IEnumerable<Appuntamento> app = con.Query<Appuntamento>(query,param);
             return app.ToList();
         }
 
-        public List<Appuntamento> pastBookings()
+        public List<Appuntamento> pastBookings(int userId)
         {
             using var con = new MySqlConnection(s);
             DateTime today = DateTime.Now;
             var query = "SELECT appuntamenti.id, appuntamenti.idEvento,appuntamenti.idUtente,appuntamenti.dataPrenotazione FROM appuntamenti " +
-                "INNER JOIN eventi on appuntamenti.idEvento=eventi.id WHERE data<'" + today.ToString("yyyyMMdd") + "'";
+                "INNER JOIN eventi on appuntamenti.idEvento=eventi.id WHERE data>='@today' AND utenti.id=@userId";
+            var param = new
+            {
+                today = today,
+                userId = userId
+            };
             IEnumerable<Appuntamento> app = con.Query<Appuntamento>(query);
             return app.ToList();
 
         }
 
         //CRUD eventi
-        public IEnumerable<Evento> ListaEventi()
+        public IEnumerable<Evento> ListaEventi(int userId)
         {
             using var con = new MySqlConnection(s);
-            var query = "SELECT * from eventi";
+            var query = "SELECT * from eventi WHERE idOrganizzatore = @userId";
+            var param = new
+            {
+                userId = userId
+            };
             return con.Query<Evento>(query);
         }
 

@@ -8,7 +8,7 @@ using provaProgetto.Models;
 
 namespace provaProgetto.Controllers
 {
-    [Route("gestione")]
+    [Route("api")]
     [ApiController]
     //[Authorize]
     [provaProgetto.Attributes.Authorize]
@@ -48,7 +48,7 @@ namespace provaProgetto.Controllers
         public IActionResult getAppuntamento(int idAppuntamento)
         {
             //Utente user = (Utente)_context.Items["user"];
-            Appuntamento a = g.GetAppuntamento(idAppuntamento);
+            Appuntamento a = g.GetAppuntamento(idAppuntamento)!;
             if(a!=null)
             {
                 return Ok(a.id);
@@ -61,7 +61,8 @@ namespace provaProgetto.Controllers
         [HttpGet("appuntamenti")]
         public IActionResult ListaAppuntamenti()
         {
-            var listaApp = g.ListaAppuntamenti();
+            var user = (Utente)_context.Items["user"]!;
+            var listaApp = g.ListaAppuntamenti(user.id);
             return Ok(listaApp);
         }
 
@@ -128,13 +129,15 @@ namespace provaProgetto.Controllers
         [HttpGet("futureBookings")]
         public IActionResult ListaAppuntamentiPast()
         {
-            var listaApp = g.futureBookings();
+            var user = (Utente)_context.Items["user"]!;
+            var listaApp = g.futureBookings(user.id);
             return Ok(listaApp);
         }
         [HttpGet("pastBookings")]
         public IActionResult ListaAppuntamentiFuture()
         {
-            var listaApp = g.pastBookings();
+            var user = (Utente)_context.Items["user"]!;
+            var listaApp = g.pastBookings(user.id);
             return Ok(listaApp);
         }
 
@@ -142,7 +145,8 @@ namespace provaProgetto.Controllers
         [HttpGet("eventi")]
         public IActionResult ListaEventi()
         {
-            var listaApp = g.ListaAppuntamenti();
+            var user = (Utente)_context.Items["user"]!;
+            var listaApp = g.ListaAppuntamenti(user.id);
             return Ok(listaApp);
         }
 
